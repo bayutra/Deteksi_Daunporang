@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="PorangAI Precision Agro - sistem deteksi penyakit daun porang berbasis EfficientNetB0." />
+  <title>PorangAI Precision Agro - Diagnosis Penyakit Daun Porang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Lewati ke konten utama</a>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- ================= TOP APP BAR ================= -->
+  <header class="appbar print-hide">
+    <div class="appbar-inner">
+      <button class="brand" data-nav="scan" aria-label="Beranda PorangAI">
+        <span class="brand-mark material-symbols-outlined">psychology</span>
+        <span class="brand-text">
+          <strong>PorangAI</strong>
+          <small>Precision Agro</small>
+        </span>
+      </button>
+
+      <div class="model-pill">
+        <span class="dot-pulse"><span></span></span>
+        <span>Model <strong>EfficientNetB0</strong>:</span>
+        <strong class="ok-text">Aktif</strong>
+      </div>
+
+      <nav class="mainnav" aria-label="Navigasi utama">
+        <button class="navlink active" data-nav="scan">Analisis Citra AI</button>
+        <button class="navlink" data-nav="history">Riwayat</button>
+        <button class="navlink" data-nav="guide">Panduan Agronomi</button>
+      </nav>
+
+      <div class="appbar-actions">
+        <span class="env-pill">
+          <span class="material-symbols-outlined">sensors</span>
+          <span>Mode Lokal</span>
+        </span>
+        <button class="icon-btn" id="helpBtn" aria-label="Bantuan" title="Bantuan">
+          <span class="material-symbols-outlined">help</span>
+        </button>
+        <button class="icon-btn" id="themeToggle" aria-label="Mode gelap" title="Mode gelap">
+          <span class="material-symbols-outlined">dark_mode</span>
+        </button>
+        <button class="btn btn-primary btn-sm" id="newScanTop">
+          <span class="material-symbols-outlined">document_scanner</span>
+          <span class="btn-label">Pindai Citra Baru</span>
+        </button>
+        <div class="avatar" title="Operator">
+          <span class="material-symbols-outlined">account_circle</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= SUB HEADER ================= -->
+  <section class="subheader print-hide" id="subheader">
+    <div class="subheader-inner">
+      <div class="subhead-main">
+        <nav class="breadcrumb" id="breadcrumb" aria-label="Breadcrumb">
+          <span>Beranda</span>
+          <span class="material-symbols-outlined">chevron_right</span>
+          <span class="current">Analisis Citra AI</span>
+        </nav>
+        <div class="subhead-title">
+          <h1 id="pageTitle">Diagnosis Penyakit Daun Porang</h1>
+          <span class="id-badge" id="pageBadge">AI VISION</span>
+        </div>
+      </div>
+      <div class="telemetry-strip" id="telemetryStrip">
+        <div class="chip">
+          <span class="material-symbols-outlined">calendar_today</span>
+          <span id="chipTime">-</span>
+        </div>
+        <div class="chip">
+          <span class="material-symbols-outlined">memory</span>
+          <span>EfficientNetB0 &middot; 3 Kelas</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MAIN ================= -->
+  <main id="main">
+    <!-- ============ SCAN VIEW ============ -->
+    <section id="scanView" class="scan-view">
+      <div class="scan-hero">
+        <div class="scan-hero-text">
+          <span class="eyebrow">Analisis Citra AI</span>
+          <h2>Deteksi penyakit daun porang dalam hitungan detik</h2>
+          <p>
+            Ambil foto langsung dari kamera atau unggah citra daun. Model
+            EfficientNetB0 akan mengklasifikasikan kondisi daun beserta tingkat
+            keparahan dan rekomendasi penanganannya.
+          </p>
+          <ul class="hero-points">
+            <li><span class="material-symbols-outlined">check_circle</span> Klasifikasi 3 kelas penyakit</li>
+            <li><span class="material-symbols-outlined">check_circle</span> Overlay area lesi &amp; heatmap</li>
+            <li><span class="material-symbols-outlined">check_circle</span> Protokol penanganan agronomi</li>
+          </ul>
+        </div>
+        <div class="scan-hero-media">
+          <img src="/static/img/sample_leaf.jpg" alt="Contoh daun porang dengan bercak lesi" />
+          <span class="media-tag">Contoh: bercak daun</span>
+        </div>
+      </div>
+
+      <div class="scan-grid">
+        <!-- UPLOAD -->
+        <section class="card scan-card" id="uploadPanel">
+          <div class="card-head">
+            <h3><span class="material-symbols-outlined">upload_file</span> Unggah Foto Daun</h3>
+            <span class="status-chip neutral">JPG &middot; PNG &middot; WEBP</span>
+          </div>
+          <div class="upload-body">
+            <label class="dropzone" for="fileInput" id="dropzone" tabindex="0" role="button" aria-label="Pilih file gambar">
+              <span class="material-symbols-outlined drop-icon">add_photo_alternate</span>
+              <p>Klik atau seret gambar ke sini</p>
+              <small>Maksimal 5MB &middot; hanya daun porang &middot; resolusi disarankan &ge; 640px</small>
+            </label>
+            <input type="file" id="fileInput" accept="image/*" hidden />
+            <div class="preview-wrap" id="previewWrap">
+              <img id="preview" alt="Pratinjau gambar" />
+              <div class="preview-placeholder" id="previewPlaceholder">
+                <span class="material-symbols-outlined">image</span>
+                <span>Pratinjau gambar akan tampil di sini</span>
+              </div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button id="uploadBtn" class="btn btn-primary">
+              <span class="material-symbols-outlined">biotech</span> Deteksi dari File
+            </button>
+            <button id="sampleBtn" class="btn btn-secondary">
+              <span class="material-symbols-outlined">science</span> Gunakan Contoh
+            </button>
+          </div>
+          <p class="hint" id="scanStatus"></p>
+        </section>
+      </div>
+
+      <div class="tips-grid">
+        <div class="tip">
+          <span class="material-symbols-outlined">light_mode</span>
+          <div><strong>Pencahayaan cukup</strong><p>Hindari bayangan tajam dan pantulan cahaya langsung.</p></div>
+        </div>
+        <div class="tip">
+          <span class="material-symbols-outlined">center_focus_strong</span>
+          <div><strong>Fokus pada daun</strong><p>Pastikan bercak terlihat jelas dan tidak blur.</p></div>
+        </div>
+        <div class="tip">
+          <span class="material-symbols-outlined">crop_free</span>
+          <div><strong>Latar sederhana</strong><p>Satu helai daun memenuhi frame memberi hasil terbaik.</p></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============ HISTORY VIEW ============ -->
+    <section id="historyView" hidden>
+      <div class="card history-card">
+        <div class="card-head">
+          <h3><span class="material-symbols-outlined">history</span> Riwayat Prediksi</h3>
+          <button id="refreshHistory" class="btn btn-secondary btn-sm">
+            <span class="material-symbols-outlined">refresh</span> Refresh
+          </button>
+        </div>
+        <div id="historyList" class="history-list">
+          <em>Memuat riwayat...</em>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RESULT VIEW ============ -->
+    <section id="resultView" hidden>
+      <div class="result-back" id="resultBack" hidden>
+        <button id="backToHistory" class="btn btn-secondary btn-sm">
+          <span class="material-symbols-outlined">arrow_back</span> Kembali ke Riwayat
+        </button>
+      </div>
+      <div class="result-grid">
+        <!-- VIEWER -->
+        <div class="card viewer-card">
+          <div class="viewer-toolbar">
+            <div class="viewer-title">
+              <span class="material-symbols-outlined">view_in_ar</span>
+              <span>Viewport Deteksi Lesi</span>
+              <span class="inference-pill" id="inferenceBadge">Analisis Citra</span>
+            </div>
+            <div class="viewer-tools">
+              <button id="toggleBbox" class="tool-btn active" aria-pressed="true" aria-label="Tampilkan bounding box area lesi" title="Bounding Box">
+                <span class="material-symbols-outlined" id="bboxIcon">check_box</span>
+                <span>Bounding Box</span>
+              </button>
+              <button id="toggleHeatmap" class="tool-btn" aria-pressed="false" aria-label="Tampilkan heatmap lesi" title="Heatmap Lesi">
+                <span class="material-symbols-outlined" id="heatmapIcon">layers</span>
+                <span>Heatmap Lesi</span>
+              </button>
+              <div class="tool-group">
+                <button id="zoomIn" class="tool-icon" title="Perbesar" aria-label="Perbesar">
+                  <span class="material-symbols-outlined">zoom_in</span>
+                </button>
+                <button id="zoomOut" class="tool-icon" title="Perkecil" aria-label="Perkecil">
+                  <span class="material-symbols-outlined">zoom_out</span>
+                </button>
+                <button id="fullscreenBtn" class="tool-icon" title="Layar penuh" aria-label="Layar penuh">
+                  <span class="material-symbols-outlined">fullscreen</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="viewer-stage" id="viewerStage">
+            <div class="viewer-empty" id="viewerEmpty">
+              <span class="material-symbols-outlined">image_search</span>
+              <p>Belum ada citra untuk dianalisis.</p>
+            </div>
+            <div class="image-frame" id="imageFrame" hidden>
+              <img id="resultImage" alt="Citra daun yang dianalisis" />
+              <img id="heatmapLayer" class="heatmap-layer" alt="" hidden />
+              <div class="bbox-layer" id="bboxLayer"></div>
+              <div class="scanline" aria-hidden="true"></div>
+              <div class="reticle" id="reticle">EfficientNetB0 &middot; 224&times;224 px</div>
+            </div>
+          </div>
+
+          <div class="viewer-meta">
+            <div class="meta-item">
+              <span class="material-symbols-outlined">photo_camera</span>
+              <span>Resolusi: <strong id="metaRes">-</strong></span>
+            </div>
+            <div class="meta-item">
+              <span class="material-symbols-outlined">pie_chart</span>
+              <span>Area Terdampak: <strong id="metaArea">-</strong></span>
+            </div>
+            <div class="meta-item">
+              <span class="material-symbols-outlined">lens_blur</span>
+              <span id="metaQuality">-</span>
+            </div>
+            <div class="meta-item">
+              <span class="material-symbols-outlined">info</span>
+              <span>Overlay lesi: segmentasi warna (indikatif)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="summary-col">
+          <div class="card summary-card">
+            <div class="summary-head">
+              <div>
+                <span class="micro-label" id="resCategory">Klasifikasi Patogen Terdeteksi</span>
+                <h2 id="resDisease">-</h2>
+                <p class="latin" id="resLatin">-</p>
+              </div>
+              <span class="status-chip moderate" id="severityBadge">
+                <span class="dot"></span> <span id="severityText">-</span>
+              </span>
+            </div>
+
+            <div class="confidence-panel">
+              <div class="confidence-copy">
+                <div class="confidence-title">
+                  <span class="material-symbols-outlined">verified</span>
+                  <strong>Kecocokan <span id="resConfidence">0</span>%</strong>
+                </div>
+                <p class="confidence-label" id="resConfLabel">-</p>
+                <p class="confidence-note" id="resConfNote">-</p>
+              </div>
+              <div class="gauge" role="img" aria-label="Skor keyakinan model">
+                <svg viewBox="0 0 36 36" aria-hidden="true">
+                  <path class="gauge-track" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-width="3.5"></path>
+                  <path class="gauge-progress" id="gaugeProgress" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="0, 100"></path>
+                </svg>
+                <div class="gauge-center">
+                  <strong id="gaugeText">0%</strong>
+                  <small>SKOR AI</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="impact-box">
+              <h4><span class="material-symbols-outlined">warning</span> <span id="impactTitle">Dampak terhadap Akumulasi Glukomanan:</span></h4>
+              <p id="impactText">-</p>
+            </div>
+
+            <div class="metric-grid" id="metricGrid"></div>
+
+            <button class="btn btn-primary btn-block" id="openProtocol">
+              <span class="material-symbols-outlined">healing</span>
+              Buka Protokol Pengendalian &amp; Dosis
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="card tabs-card">
+        <div class="tabs-nav" role="tablist" aria-label="Detail diagnosis">
+          <button class="tab-btn active" data-tab="gejala" role="tab" aria-selected="true">
+            <span class="material-symbols-outlined">coronavirus</span> Gejala &amp; Faktor Penyebab
+          </button>
+          <button class="tab-btn" data-tab="rekomendasi" role="tab" aria-selected="false">
+            <span class="material-symbols-outlined">medical_services</span> Rekomendasi Penanganan &amp; Solusi
+          </button>
+          <button class="tab-btn" data-tab="pencegahan" role="tab" aria-selected="false">
+            <span class="material-symbols-outlined">shield</span> Langkah Pencegahan &amp; Budidaya
+          </button>
+        </div>
+        <div class="tabs-body">
+          <div class="tab-panel" data-panel="gejala" id="tabPanelGejala" role="tabpanel"></div>
+          <div class="tab-panel" data-panel="rekomendasi" id="tabPanelRekomendasi" role="tabpanel" hidden></div>
+          <div class="tab-panel" data-panel="pencegahan" id="tabPanelPencegahan" role="tabpanel" hidden></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= BOTTOM ACTION BAR ================= -->
+  <div class="bottombar print-hide" id="bottomBar" hidden>
+    <div class="bottombar-inner">
+      <div class="save-status">
+        <span class="dot-pulse"><span></span></span>
+        <div>
+          <strong id="saveText">Diagnosis tersimpan di riwayat lokal</strong>
+          <span id="saveSub">Sinkronisasi penyimpanan SQL berhasil</span>
+        </div>
+      </div>
+      <div class="bottombar-actions">
+        <button id="downloadPdf" class="btn btn-secondary">
+          <span class="material-symbols-outlined">picture_as_pdf</span>
+          <span>Unduh Laporan PDF</span>
+        </button>
+        <button id="shareBtn" class="btn btn-secondary">
+          <span class="material-symbols-outlined">share</span>
+          <span>Bagikan</span>
+        </button>
+        <button id="newScanBottom" class="btn btn-primary">
+          <span class="material-symbols-outlined">camera_alt</span>
+          <span>Pindai Gambar Lain</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= GUIDE MODAL ================= -->
+  <div class="modal" id="guideModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+      <div class="modal-head">
+        <div>
+          <span class="micro-label">Panduan Agronomi</span>
+          <h2 id="guideTitle">Ensiklopedia Penyakit Daun Porang</h2>
+        </div>
+        <button class="icon-btn" data-close="guideModal" aria-label="Tutup">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body" id="guideContent">
+        <em>Memuat panduan...</em>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= HELP MODAL ================= -->
+  <div class="modal" id="helpModal" hidden>
+    <div class="modal-card modal-sm" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <div class="modal-head">
+        <div>
+          <span class="micro-label">Bantuan</span>
+          <h2 id="helpTitle">Cara Menggunakan PorangAI</h2>
+        </div>
+        <button class="icon-btn" data-close="helpModal" aria-label="Tutup">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ol class="help-steps">
+          <li><strong>Pilih metode input.</strong> Gunakan kamera langsung atau unggah foto daun (JPG/PNG/WEBP, maks 5MB).</li>
+          <li><strong>Ambil gambar yang jelas.</strong> Satu helai daun memenuhi frame, fokus tajam, dan pencahayaan merata.</li>
+          <li><strong>Jalankan deteksi.</strong> Model EfficientNetB0 mengklasifikasikan kondisi daun ke dalam 3 kelas.</li>
+          <li><strong>Baca laporan.</strong> Lihat tingkat keparahan, overlay lesi, dan protokol penanganan pada tab yang tersedia.</li>
+          <li><strong>Simpan atau bagikan.</strong> Unduh laporan sebagai PDF atau bagikan ringkasan diagnosis.</li>
+        </ol>
+        <div class="notice">
+          <span class="material-symbols-outlined">info</span>
+          <p>Sistem khusus untuk daun porang. Citra yang bukan daun porang (atau tidak jelas) akan ditolak. Hasil model bersifat alat bantu; keputusan agronomi akhir tetap perlu mempertimbangkan kondisi lapangan dan pendampingan penyuluh.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+flask>=3.0
+tensorflow>=2.15
+numpy
+opencv-python
+pillow
+gunicorn
+python-dotenv
+pytest

@@ -1,0 +1,1 @@
+"""PorangAI Precision Agro - core package."""
