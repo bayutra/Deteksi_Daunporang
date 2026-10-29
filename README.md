@@ -387,7 +387,58 @@ Verifikasi manual yang dilakukan:
 
 ---
 
-## Catatan Produksi
+## Deployment (Public)
+
+Aplikasi dapat dideploy secara publik. Karena menggunakan TensorFlow + model 50MB,
+disarankan platform yang mendukung container atau ML.
+
+### Opsi 1 — Hugging Face Spaces (gratis, direkomendasikan untuk ML)
+
+1. Buat Space baru di https://huggingface.co/spaces → pilih **Docker**.
+2. Clone repo Space, salin isi proyek (atau push repo ini).
+3. Pastikan `Dockerfile` ada di root Space.
+4. Space akan build & run otomatis di port 7860.
+5. Aplikasi publik di `https://huggingface.co/spaces/<user>/<space>`.
+
+### Opsi 2 — Render (gratis/paid)
+
+1. Push repo ke GitHub.
+2. Di Render: **New → Web Service** → pilih repo.
+3. Render mendeteksi `Dockerfile` (atau gunakan `Procfile`).
+4. Set environment variables: `MODEL_PATH`, `MAX_UPLOAD_MB`, dll.
+5. Deploy. (Free tier sleep setelah 15 menit idle; TensorFlow cold start ~30–60s.)
+
+### Opsi 3 — VPS (DigitalOcean, AWS EC2, dll.)
+
+```bash
+git clone https://github.com/bayutra/Deteksi_Daunporang.git
+cd Deteksi_Daunporang
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+# Jalankan dengan gunicorn di belakang (systemd/supervisor)
+gunicorn app:app --bind 0.0.0.0:8000 --workers 1 --timeout 120
+```
+
+Gunakan Nginx sebagai reverse proxy + HTTPS (Let's Encrypt).
+
+### Catatan Deployment
+
+- **Filesystem ephemeral**: Di Render/Cloud Run, `porang.db` dan `uploads/` hilang
+  saat redeploy. Untuk produksi, gunakan database terkelola (PostgreSQL/Supabase)
+  atau volume persisten. Untuk demo, SQLite cukup.
+- **Memori**: TensorFlow membutuhkan ~500MB+ RAM. Gunakan 1 worker gunicorn.
+- **Cold start**: model dimuat saat startup (~10–30s). Set timeout gunicorn ≥ 120s.
+- **Git LFS**: untuk menghindari warning file besar, gunakan Git LFS untuk
+  `models/baseline_porang.keras`:
+  ```bash
+  git lfs install
+  git lfs track "models/*.keras"
+  git add .gitattributes models/baseline_porang.keras
+  git commit -m "Track model with LFS"
+  git push
+  ```
+- **Environment**: set `MODEL_PATH` absolut sesuai path di server, atau biarkan
+  auto-detect (`models/baseline_porang.keras` relatif ke root).
 
 - Sistem **khusus untuk daun porang**. Citra yang bukan daun porang (atau tidak jelas) ditolak oleh guard heuristik (area hijau daun, tekstur, bentuk) dan ambang keyakinan model. Guard ini **heuristik**, bukan detektor porang terlatih; citra daun hijau lain (mis. padi) dengan tekstur bisa lolos. Untuk deteksi porang yang benar-benar ketat, diperlukan model biner/OOD terlatih.
 - Deteksi lesi memakai segmentasi warna untuk visualisasi, **bukan** model
